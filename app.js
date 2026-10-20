@@ -427,7 +427,7 @@
         blocoMatriz(S.MATRIZES[0], A, B) +
         blocoMatriz(S.MATRIZES[1], A, C) +
         '<button type="button" class="btn primario" id="baixar-pdf">Baixar PDF</button>' +
-        '<div class="aviso-final">Pronto. Mantenha esta tela aberta e responda a folha de reflexão. Na troca da mesa, celular virado para baixo.</div>' +
+        '<div class="aviso-final">Pronto. Responda a folha de reflexão. Você pode guardar o celular quando terminar.</div>' +
         '<p class="status-envio" id="status-envio"></p>' +
       '</section>';
     document.getElementById('baixar-pdf').addEventListener('click', function () {
