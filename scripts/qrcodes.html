@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR codes das mesas · Sua Área S.A.</title>
+  <style>
+    body { font-family: system-ui, sans-serif; color: #0D1B2A; margin: 24px; }
+    .barra { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+    input { font: inherit; padding: 8px 10px; width: 420px; max-width: 100%; border: 1px solid #aab; border-radius: 6px; }
+    button { font: inherit; padding: 8px 14px; border-radius: 6px; border: 0; background: #2A9D8F; color: #fff; cursor: pointer; }
+    .grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .ficha { border: 2px solid #0D1B2A; border-radius: 12px; padding: 16px; text-align: center; break-inside: avoid; }
+    .ficha h2 { margin: 0 0 8px; font-size: 28px; }
+    .ficha canvas { width: 220px !important; height: 220px !important; }
+    .ficha small { display: block; margin-top: 6px; color: #556; word-break: break-all; font-size: 11px; }
+    @media print { .barra { display: none; } body { margin: 8mm; } }
+  </style>
+</head>
+<body>
+  <div class="barra">
+    <label for="base">Endereço do app:</label>
+    <input id="base" value="https://SEU-DOMINIO/" placeholder="https://usuario.github.io/sua-area-sa/">
+    <button id="gerar" type="button">Gerar 6 QR codes</button>
+    <button id="imprimir" type="button">Imprimir</button>
+  </div>
+  <div class="grade" id="grade"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script>
+    function gerar() {
+      var base = document.getElementById('base').value.trim();
+      if (base.charAt(base.length - 1) !== '/') base += '/';
+      var grade = document.getElementById('grade');
+      grade.innerHTML = '';
+      for (var m = 1; m <= 6; m++) {
+        var url = base + '?mesa=' + m;
+        var ficha = document.createElement('div');
+        ficha.className = 'ficha';
+        ficha.innerHTML = '<h2>Mesa ' + m + '</h2>';
+        var canvas = document.createElement('canvas');
+        ficha.appendChild(canvas);
+        var small = document.createElement('small');
+        small.textContent = url;
+        ficha.appendChild(small);
+        grade.appendChild(ficha);
+        QRCode.toCanvas(canvas, url, { width: 440, margin: 1, errorCorrectionLevel: 'M' });
+      }
+    }
+    document.getElementById('gerar').addEventListener('click', gerar);
+    document.getElementById('imprimir').addEventListener('click', function () { window.print(); });
+  </script>
+</body>
+</html>

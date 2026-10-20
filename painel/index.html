@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sua Área S.A. · Painel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 1rem = 16px em 1920 px de largura: o painel escala com a janela */
+    html { font-size: 0.8333vw; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: #0D1B2A; color: #F7F7F3; overflow: hidden;
+      font-family: 'Open Sans', system-ui, sans-serif; font-size: 1.25rem; line-height: 1.3;
+      min-height: 100vh;
+    }
+    h1, h2, h3 { font-family: 'Montserrat', sans-serif; margin: 0; }
+
+    .tela { height: 100vh; padding: 1.8rem 2.6rem 1.4rem; display: grid; grid-template-rows: auto 1fr auto; gap: 1.4rem; }
+
+    header { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
+    .marca { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 1rem; letter-spacing: .1em; text-transform: uppercase; color: #2A9D8F; }
+    header h1 { font-size: 2.6rem; font-weight: 800; margin-top: .2rem; }
+    .contador { text-align: right; }
+    .contador .grande { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 2.6rem; }
+    .contador .grande span { color: #2A9D8F; }
+    .contador .niveis { color: #A9B6C3; font-size: 1.1rem; margin-top: .1rem; }
+    .progresso { height: .5rem; background: #1B2D40; border-radius: .25rem; margin-top: .5rem; overflow: hidden; }
+    .progresso i { display: block; height: 100%; background: #2A9D8F; transition: width .6s; }
+
+    main { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.6rem; min-height: 0; }
+    .coluna { display: grid; gap: 1.6rem; min-height: 0; }
+    .coluna.direita { grid-template-rows: 1.2fr 1fr; }
+
+    .bloco { background: #12263A; border-radius: 1rem; padding: 1.4rem 1.7rem; min-height: 0; overflow: hidden; }
+    .bloco h2 { font-size: 1.55rem; font-weight: 700; margin-bottom: .3rem; }
+    .bloco .sub { color: #A9B6C3; font-size: 1rem; margin-bottom: 1rem; }
+    .bloco h3 { font-size: 1.05rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #A9B6C3; margin: 1rem 0 .5rem; }
+
+    .legenda { display: flex; gap: 1.6rem; font-size: 1rem; color: #A9B6C3; margin-bottom: .7rem; }
+    .legenda b { display: inline-block; width: 1.1rem; height: .7rem; border-radius: .2rem; margin-right: .4rem; vertical-align: middle; }
+
+    .linha-barra { display: grid; grid-template-columns: 13.5rem 1fr 4.2rem; align-items: center; gap: 1rem; padding: .62rem 0; }
+    .linha-barra .nome { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .linha-barra .nome b { font-family: 'Montserrat', sans-serif; color: #2A9D8F; margin-right: .5rem; }
+    .linha-barra.alerta .nome b { color: #F76C5E; }
+    .barras { display: grid; gap: .3rem; }
+    .barra { display: flex; align-items: center; gap: .6rem; height: 1.1rem; }
+    .barra i { display: block; height: 100%; border-radius: .2rem; transition: width .6s; }
+    .barra span { font-size: .9rem; color: #A9B6C3; min-width: 2.2rem; }
+    .energia i { background: #2A9D8F; }
+    .expectativa i { background: #7F93A8; }
+    .alerta .expectativa i { background: #F76C5E; }
+    .dif { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.15rem; text-align: right; color: #A9B6C3; }
+    .alerta .dif { color: #F76C5E; }
+
+    .ranking { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+    .ranking li { display: grid; grid-template-columns: 2.4rem 1fr auto; gap: .8rem; align-items: center; background: #0D1B2A; border-radius: .7rem; padding: .55rem .9rem; }
+    .ranking .pos { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 1.5rem; color: #2A9D8F; }
+    .ranking .nome b { font-family: 'Montserrat', sans-serif; margin-right: .5rem; }
+    .ranking .nome { font-size: 1.15rem; }
+    .ranking .qtd { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.3rem; }
+    .ranking .qtd small { font-family: 'Open Sans', sans-serif; font-weight: 400; color: #A9B6C3; font-size: .95rem; }
+    .ranking.coral .pos, .ranking.coral .qtd { color: #F76C5E; }
+    .vazio { color: #A9B6C3; font-size: 1.05rem; padding: .4rem 0; }
+    .dois { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .dois h3 { margin-top: .2rem; }
+
+    footer { display: flex; align-items: center; justify-content: space-between; color: #7F93A8; font-size: .95rem; }
+    .filtro { display: flex; gap: .4rem; opacity: .55; transition: opacity .2s; }
+    .filtro:hover { opacity: 1; }
+    .filtro button {
+      font: inherit; font-size: .95rem; color: #F7F7F3; background: transparent; border: 1px solid #34506B;
+      border-radius: 2rem; padding: .3rem 1rem; cursor: pointer;
+    }
+    .filtro button.ativo { background: #2A9D8F; border-color: #2A9D8F; color: #fff; }
+    .aguardando { display: flex; align-items: center; justify-content: center; height: 100%; color: #A9B6C3; font-size: 1.6rem; }
+  </style>
+</head>
+<body>
+  <div class="tela">
+    <header>
+      <div>
+        <div class="marca">Alcitá Advisory · Sentar na Cadeira</div>
+        <h1>Sua Área S.A. · retrato da sala</h1>
+      </div>
+      <div class="contador">
+        <div class="grande" id="contador">0 de 27 responderam</div>
+        <div class="niveis" id="niveis"></div>
+        <div class="progresso"><i id="barra-progresso" style="width:0"></i></div>
+      </div>
+    </header>
+
+    <main>
+      <section class="bloco" id="b2">
+        <h2>Energia × Expectativa da sala</h2>
+        <div class="legenda">
+          <span><b style="background:#2A9D8F"></b>Média de energia (A)</span>
+          <span><b style="background:#7F93A8"></b>Média de expectativa (B)</span>
+          <span><b style="background:#F76C5E"></b>Expectativa acima da energia</span>
+        </div>
+        <div id="barras"></div>
+      </section>
+
+      <div class="coluna direita">
+        <section class="bloco" id="b3">
+          <h2>Onde a sala é o sistema</h2>
+          <div class="sub" id="sub3">Energia alta e impacto alto se a pessoa sair</div>
+          <div class="dois">
+            <div><h3>Você é o sistema</h3><ol class="ranking" id="sistema"></ol></div>
+            <div><h3>Ponta solta</h3><ol class="ranking coral" id="ponta"></ol></div>
+          </div>
+        </section>
+        <section class="bloco" id="b4">
+          <h2>Expectativa a descoberto</h2>
+          <div class="sub">Esperam muito e a energia é baixa</div>
+          <ol class="ranking coral" id="descoberto"></ol>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="filtro" id="filtro">
+        <button type="button" data-f="todos" class="ativo">Todos</button>
+        <button type="button" data-f="coordenacao">Coordenação</button>
+        <button type="button" data-f="gerencia">Gerência</button>
+        <button type="button" data-f="executivo">Executivo</button>
+      </div>
+      <div id="status"></div>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../shared.js"></script>
+  <script src="painel.js"></script>
+</body>
+</html>
