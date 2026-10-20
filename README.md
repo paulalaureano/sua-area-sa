@@ -1,6 +1,6 @@
 # Sua Área S.A.
 
-Ferramenta da Rodada Sentar na Cadeira (Workshop Alcitá Advisory, Casa OcaHuna). Participante ordena as 10 frentes da sua área em três telas, vê as duas matrizes e baixa o PDF. A facilitadora projeta o painel com o retrato da sala. Especificação completa no documento "Sua Área S.A. · especificação do app da Rodada 2".
+Ferramenta da Rodada Performance Sustentável (Workshop Alcitá Advisory, Casa OcaHuna). Participante ordena as 10 frentes da sua área em três telas, vê as duas matrizes e baixa o PDF. A facilitadora projeta o painel com o retrato da sala. Especificação completa no documento "Sua Área S.A. · especificação do app da Rodada 2".
 
 ## Estrutura
 

@@ -153,7 +153,7 @@
 
     app.innerHTML =
       '<section class="tela boas">' +
-        '<div class="marca">Alcitá Advisory · Sentar na Cadeira</div>' +
+        '<div class="marca">Alcitá Advisory · Performance Sustentável</div>' +
         '<h1>Sua Área S.A.</h1>' +
         '<p class="texto">A sua área é uma companhia, e você é o(a) CEO. Em três telas, você vai ordenar as 10 frentes dela. Leva uns 5 minutos. Nada aqui identifica você.</p>' +
         '<div class="mesa-linha">' +
@@ -628,7 +628,7 @@
     doc.setTextColor(c[0], c[1], c[2]);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    doc.text('Alcitá Advisory · Sentar na Cadeira', 105, 287, { align: 'center' });
+    doc.text('Alcitá Advisory · Performance Sustentável', 105, 287, { align: 'center' });
 
     doc.save('sua-area-sa-matrizes.pdf');
   }
