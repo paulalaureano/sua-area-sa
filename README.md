@@ -10,7 +10,8 @@ Ferramenta da Rodada Sentar na Cadeira (Workshop Alcitá Advisory, Casa OcaHuna)
 | `painel/index.html`, `painel/painel.js` | Painel do projetor (`/painel/`) |
 | `shared.js` | Frentes, textos das telas, gabaritos, cores e regras de nota e quadrante |
 | `config.js` | URL e chave do Supabase, evento e total esperado |
-| `supabase/schema.sql` | Tabela, RLS e função `painel` |
+| `supabase/schema.sql` | Tabela, RLS e função `painel` (versão completa) |
+| `supabase/atualizacao-painel.sql` | Só a função `painel` atualizada, para quem já rodou o `schema.sql` antes |
 | `scripts/qrcodes.html` | Gera e imprime os 6 QR codes |
 | `scripts/teste-carga.mjs` | 30 inserts simultâneos e verificação da RLS |
 
@@ -23,6 +24,16 @@ Tudo é HTML, CSS e JavaScript puro. Bibliotecas por CDN: supabase-js, SortableJ
 3. **Publicar.** Suba a pasta para um repositório no GitHub e ative o GitHub Pages (ou importe na Vercel). Não precisa de build.
 4. **QR codes.** Abra `scripts/qrcodes.html` no computador, informe o endereço publicado e imprima. Cada mesa recebe `https://<dominio>/?mesa=N`.
 5. **Painel.** Abra `https://<dominio>/painel/` no computador do projetor, em tela cheia. `?total=27` muda o total esperado sem editar arquivo.
+
+## Painel: três visões
+
+Os botões no rodapé (ou as teclas 1, 2 e 3) alternam:
+
+1. **Visão geral:** energia contra expectativa, onde a sala é o sistema, pontas soltas e expectativa a descoberto.
+2. **Divergências:** média e divergência (desvio padrão) das notas de cada frente. Mostra onde a sala está dividida.
+3. **Mesas:** mapa de calor das 6 mesas lado a lado, por frente. Alterna entre expectativa menos energia, energia, expectativa e impacto.
+
+O seletor por nível vale para as visões 1 e 2. Se uma visão pedir a função atualizada, rode `supabase/atualizacao-painel.sql`.
 
 ## Ensaios e dia do evento
 
@@ -49,6 +60,7 @@ Tudo é HTML, CSS e JavaScript puro. Bibliotecas por CDN: supabase-js, SortableJ
 
 ## Desvios em relação à especificação
 
+- A função `painel` também devolve `dp_*` (desvio padrão) e `por_mesa_frente`, usados nas visões Divergências e Mesas.
 - `por_nivel_frente` na função `painel` também devolve `n` e os contadores de quadrante, para o seletor por nível funcionar nos blocos 3 e 4 (a especificação prevê essa extensão).
 - Restrição `jsonb_typeof = 'object'` nas colunas de notas e índice em `evento`.
 - Linha de status de envio no fim da Tela 4.

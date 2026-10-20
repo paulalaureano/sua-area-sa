@@ -38,7 +38,7 @@ security definer
 set search_path = public
 as $$
 with base as (
-  select r.nivel, f.key as frente,
+  select r.nivel, r.mesa, f.key as frente,
          (r.energia->>f.key)::int     as a,
          (r.expectativa->>f.key)::int as b,
          (r.impacto->>f.key)::int     as c
@@ -55,6 +55,9 @@ select json_build_object(
              round(avg(a),1) as media_energia,
              round(avg(b),1) as media_expectativa,
              round(avg(c),1) as media_impacto,
+             round(coalesce(stddev_pop(a),0),1) as dp_energia,
+             round(coalesce(stddev_pop(b),0),1) as dp_expectativa,
+             round(coalesce(stddev_pop(c),0),1) as dp_impacto,
              count(*) filter (where a>=6 and b>=6) as m1_foco_certo,
              count(*) filter (where a>=6 and b<=5) as m1_aposta,
              count(*) filter (where a<=5 and b>=6) as m1_descoberto,
@@ -62,20 +65,29 @@ select json_build_object(
              count(*) filter (where a>=6 and c<=5) as m2_delegar,
              count(*) filter (where a<=5 and c>=6) as m2_ponta_solta
       from base group by frente) t),
-  -- por nível, com os mesmos contadores de quadrante, para o filtro do painel
   'por_nivel_frente', (select json_agg(t) from (
       select nivel, frente,
              count(*) as n,
              round(avg(a),1) as media_energia,
              round(avg(b),1) as media_expectativa,
              round(avg(c),1) as media_impacto,
+             round(coalesce(stddev_pop(a),0),1) as dp_energia,
+             round(coalesce(stddev_pop(b),0),1) as dp_expectativa,
+             round(coalesce(stddev_pop(c),0),1) as dp_impacto,
              count(*) filter (where a>=6 and b>=6) as m1_foco_certo,
              count(*) filter (where a>=6 and b<=5) as m1_aposta,
              count(*) filter (where a<=5 and b>=6) as m1_descoberto,
              count(*) filter (where a>=6 and c>=6) as m2_sistema,
              count(*) filter (where a>=6 and c<=5) as m2_delegar,
              count(*) filter (where a<=5 and c>=6) as m2_ponta_solta
-      from base group by nivel, frente) t)
+      from base group by nivel, frente) t),
+  'por_mesa_frente', (select json_agg(t) from (
+      select mesa, frente,
+             count(*) as n,
+             round(avg(a),1) as media_energia,
+             round(avg(b),1) as media_expectativa,
+             round(avg(c),1) as media_impacto
+      from base group by mesa, frente) t)
 );
 $$;
 
