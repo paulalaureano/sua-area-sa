@@ -226,9 +226,9 @@
         '<div class="progresso">Tela ' + n + ' de 3 · ' + t.nome + '</div>' +
         '<div class="letra-pergunta"><span class="letra">' + letra + '</span><h1>' + t.pergunta + '</h1></div>' +
         '<p class="instrucao">' + t.instrucao + '</p>' +
-        '<div class="rotulo-lista">mais</div>' +
+        '<div class="rotulo-lista">1º lugar · mais</div>' +
         '<ol class="lista" id="lista"></ol>' +
-        '<div class="rotulo-lista">menos</div>' +
+        '<div class="rotulo-lista">10º lugar · menos</div>' +
         '<button type="button" class="btn primario" id="confirmar">Confirmar ordem</button>' +
       '</section>';
     desenharLista(letra);
@@ -243,9 +243,9 @@
       var f = frente(ordem[i]);
       html +=
         '<li class="cartao" data-sigla="' + f.sigla + '">' +
-          '<div class="selo-nota">' + (10 - i) + '</div>' +
+          '<div class="selo-nota">' + (i + 1) + 'º</div>' +
           '<div class="corpo">' +
-            '<div class="titulo"><span class="sigla">' + f.sigla + '</span>' + f.nome + '</div>' +
+            '<div class="titulo"><span class="sigla">' + f.rotulo + '</span>' + f.nome + '</div>' +
             '<div class="desc">' + f.desc + '</div>' +
           '</div>' +
           '<div class="alca" title="Arrastar">' + ICONE_ALCA + '</div>' +
@@ -286,7 +286,7 @@
   function atualizarCartoes(lista, ordem) {
     var itens = lista.children;
     for (var i = 0; i < itens.length; i++) {
-      itens[i].querySelector('.selo-nota').textContent = String(10 - i);
+      itens[i].querySelector('.selo-nota').textContent = (i + 1) + 'º';
       itens[i].querySelector('.sobe').disabled = (i === 0);
       itens[i].querySelector('.desce').disabled = (i === itens.length - 1);
     }
@@ -355,43 +355,49 @@
 
   /* ---------- tela 4: matrizes ---------- */
 
+  var estadoQuadrante = { 0: null, 1: null };
+
   function matrizSVG(m, A, X) {
     var cell = 28, gx = 44, gy = 28, W = cell * 10;
     var C = S.CORES;
     var s = '<svg class="matriz" viewBox="0 0 352 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + m.titulo + '">';
 
-    var pos = { 1: [5, 0], 2: [0, 0], 3: [5, 5], 4: [0, 5] };
     [1, 2, 3, 4].forEach(function (q) {
-      s += '<rect x="' + (gx + pos[q][0] * cell) + '" y="' + (gy + pos[q][1] * cell) + '" width="' + (5 * cell) + '" height="' + (5 * cell) + '" fill="' + C.q[q].fundo + '"/>';
+      var p = S.POS_Q[q];
+      s += '<rect class="qr qr' + q + '" data-q="' + q + '" x="' + (gx + p[0] * cell) + '" y="' + (gy + p[1] * cell) + '" width="' + (5 * cell) + '" height="' + (5 * cell) + '" fill="' + C.q[q].fundo + '"/>';
     });
 
     for (var i = 1; i < 10; i++) {
-      s += '<line x1="' + (gx + i * cell) + '" y1="' + gy + '" x2="' + (gx + i * cell) + '" y2="' + (gy + W) + '" stroke="#fff" stroke-width="1" opacity=".85"/>';
-      s += '<line x1="' + gx + '" y1="' + (gy + i * cell) + '" x2="' + (gx + W) + '" y2="' + (gy + i * cell) + '" stroke="#fff" stroke-width="1" opacity=".85"/>';
+      s += '<line class="nt" x1="' + (gx + i * cell) + '" y1="' + gy + '" x2="' + (gx + i * cell) + '" y2="' + (gy + W) + '" stroke="#fff" stroke-width="1" opacity=".85"/>';
+      s += '<line class="nt" x1="' + gx + '" y1="' + (gy + i * cell) + '" x2="' + (gx + W) + '" y2="' + (gy + i * cell) + '" stroke="#fff" stroke-width="1" opacity=".85"/>';
     }
-    s += '<rect x="' + gx + '" y="' + gy + '" width="' + W + '" height="' + W + '" fill="none" stroke="#B9C0C7" stroke-width="1"/>';
-    s += '<line x1="' + (gx + 5 * cell) + '" y1="' + gy + '" x2="' + (gx + 5 * cell) + '" y2="' + (gy + W) + '" stroke="' + C.navy + '" stroke-width="1.6" stroke-dasharray="6 4"/>';
-    s += '<line x1="' + gx + '" y1="' + (gy + 5 * cell) + '" x2="' + (gx + W) + '" y2="' + (gy + 5 * cell) + '" stroke="' + C.navy + '" stroke-width="1.6" stroke-dasharray="6 4"/>';
+    s += '<rect class="nt" x="' + gx + '" y="' + gy + '" width="' + W + '" height="' + W + '" fill="none" stroke="#B9C0C7" stroke-width="1"/>';
+    s += '<line class="nt" x1="' + (gx + 5 * cell) + '" y1="' + gy + '" x2="' + (gx + 5 * cell) + '" y2="' + (gy + W) + '" stroke="' + C.navy + '" stroke-width="1.6" stroke-dasharray="6 4"/>';
+    s += '<line class="nt" x1="' + gx + '" y1="' + (gy + 5 * cell) + '" x2="' + (gx + W) + '" y2="' + (gy + 5 * cell) + '" stroke="' + C.navy + '" stroke-width="1.6" stroke-dasharray="6 4"/>';
 
+    // 1º lugar no topo (eixo vertical) e à esquerda (eixo horizontal)
     for (var v = 1; v <= 10; v++) {
-      s += '<text x="' + (gx + (v - 0.5) * cell) + '" y="' + (gy + W + 18) + '" text-anchor="middle" font-size="11" fill="' + C.cinza + '">' + v + '</text>';
-      s += '<text x="' + (gx - 10) + '" y="' + (gy + (10 - v + 0.5) * cell + 4) + '" text-anchor="middle" font-size="11" fill="' + C.cinza + '">' + v + '</text>';
+      s += '<text class="nt" x="' + (gx + (v - 0.5) * cell) + '" y="' + (gy + W + 18) + '" text-anchor="middle" font-size="10" fill="' + C.cinza + '">' + S.ordinal(v) + '</text>';
+      s += '<text class="nt" x="' + (gx - 9) + '" y="' + (gy + (v - 0.5) * cell + 3.5) + '" text-anchor="middle" font-size="10" fill="' + C.cinza + '">' + S.ordinal(v) + '</text>';
     }
 
-    s += '<text x="' + (gx + W / 2) + '" y="' + (gy + W + 44) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + C.navy + '">' + m.eixoX + '</text>';
-    s += '<text transform="translate(12 ' + (gy + W / 2) + ') rotate(-90)" text-anchor="middle" font-size="12" font-weight="700" fill="' + C.navy + '">A · Energia</text>';
+    s += '<text class="nt" x="' + (gx + W / 2) + '" y="' + (gy + W + 44) + '" text-anchor="middle" font-size="12" font-weight="700" fill="' + C.navy + '">' + m.eixoX + '</text>';
+    s += '<text class="nt" transform="translate(12 ' + (gy + W / 2) + ') rotate(-90)" text-anchor="middle" font-size="12" font-weight="700" fill="' + C.navy + '">A · Energia</text>';
 
-    var selos = { 1: [gx + W + 12, gy - 12], 2: [gx - 12, gy - 12], 3: [gx + W + 12, gy + W + 12], 4: [gx - 12, gy + W + 12] };
+    var selos = { 1: [gx - 12, gy - 12], 2: [gx + W + 12, gy - 12], 3: [gx - 12, gy + W + 12], 4: [gx + W + 12, gy + W + 12] };
     [1, 2, 3, 4].forEach(function (q) {
-      s += '<circle cx="' + selos[q][0] + '" cy="' + selos[q][1] + '" r="10" fill="' + C.q[q].selo + '"/>';
-      s += '<text x="' + selos[q][0] + '" y="' + (selos[q][1] + 4.5) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">' + q + '</text>';
+      s += '<g data-q="' + q + '" class="selo-svg"><circle cx="' + selos[q][0] + '" cy="' + selos[q][1] + '" r="10" fill="' + C.q[q].selo + '"/>' +
+        '<text x="' + selos[q][0] + '" y="' + (selos[q][1] + 4.5) + '" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">' + q + '</text></g>';
     });
 
     S.FRENTES.forEach(function (f) {
-      var cx = gx + (X[f.sigla] - 0.5) * cell;
-      var cy = gy + (10 - A[f.sigla] + 0.5) * cell;
-      s += '<circle cx="' + cx + '" cy="' + cy + '" r="6" fill="' + C.coral + '" stroke="#fff" stroke-width="1.5"/>';
-      s += '<text class="sigla-ponto" x="' + (cx + 9) + '" y="' + (cy + 3.6) + '" font-size="10" font-weight="700" fill="' + C.navy + '">' + f.sigla + '</text>';
+      var pX = S.posicao(X[f.sigla]), pA = S.posicao(A[f.sigla]);
+      var cx = gx + (pX - 0.5) * cell;
+      var cy = gy + (pA - 0.5) * cell;
+      var larg = f.curto.length * 5.9;
+      var inverte = (cx + 9 + larg) > (gx + W + 6);
+      s += '<circle class="nt" cx="' + cx + '" cy="' + cy + '" r="6" fill="' + C.coral + '" stroke="#fff" stroke-width="1.5"/>';
+      s += '<text class="nt sigla-ponto" x="' + (inverte ? cx - 9 : cx + 9) + '" y="' + (cy + 3.6) + '" text-anchor="' + (inverte ? 'end' : 'start') + '" font-size="10" font-weight="700" fill="' + C.navy + '">' + f.curto + '</text>';
     });
 
     return s + '</svg>';
@@ -399,37 +405,88 @@
 
   function porQuadrante(A, X) {
     var r = { 1: [], 2: [], 3: [], 4: [] };
-    S.FRENTES.forEach(function (f) { r[S.quadrante(A[f.sigla], X[f.sigla])].push(f.sigla); });
+    S.FRENTES.forEach(function (f) { r[S.quadrante(A[f.sigla], X[f.sigla])].push(f); });
     return r;
   }
 
-  function blocoMatriz(m, A, X) {
+  function blocoMatriz(m, idx, A, X) {
     var porQ = porQuadrante(A, X);
-    var lis = '';
+    var chips = '';
     [1, 2, 3, 4].forEach(function (q) {
-      var d = m.quadrantes[q];
-      lis +=
-        '<li class="q' + q + '">' +
+      chips +=
+        '<button type="button" class="chip q' + q + '" data-q="' + q + '" aria-pressed="false">' +
           '<span class="selo-q">' + q + '</span>' +
-          '<div><strong>' + d.nome + '</strong><span class="pos">' + d.pos + '</span>' +
-          '<p>' + d.texto + '</p>' +
-          '<p class="neste"><b>Neste quadrante:</b> ' + (porQ[q].length ? porQ[q].join(', ') : 'nenhuma') + '</p></div>' +
-        '</li>';
+          '<span class="chip-nome">' + m.quadrantes[q].nome + '</span>' +
+          '<span class="chip-n">' + porQ[q].length + '</span>' +
+        '</button>';
     });
-    return '<div class="bloco-matriz"><h2>' + m.titulo + '</h2>' + matrizSVG(m, A, X) + '<ul class="gabarito">' + lis + '</ul></div>';
+    return '<div class="bloco-matriz" data-m="' + idx + '">' +
+      '<h2>' + m.titulo + '</h2>' +
+      '<p class="legenda-eixos">O 1º lugar fica no topo e à esquerda. Toque em um quadrante para ver o diagnóstico.</p>' +
+      matrizSVG(m, A, X) +
+      '<div class="faixa-q" role="group" aria-label="Quadrantes">' + chips + '</div>' +
+      '<div class="diagnostico" aria-live="polite"></div>' +
+    '</div>';
+  }
+
+  function textoDiagnostico(idx, q) {
+    var m = S.MATRIZES[idx];
+    var A = estado.notas.A, X = estado.notas[m.tela];
+    var d = m.quadrantes[q];
+    var lista = porQuadrante(A, X)[q].slice().sort(function (a, b) { return A[b.sigla] - A[a.sigla]; });
+    var itens = lista.map(function (f) {
+      return '<li><strong>' + f.nome + '</strong><span>energia ' + S.ordinal(S.posicao(A[f.sigla])) +
+        ' · ' + m.dimX + ' ' + S.ordinal(S.posicao(X[f.sigla])) + '</span></li>';
+    }).join('');
+    return '<div class="diag q' + q + '">' +
+      '<div class="diag-topo"><span class="selo-q grande">' + q + '</span>' +
+      '<div><h3>' + d.nome + '</h3><span class="pos">' + d.pos + '</span></div></div>' +
+      '<p class="diag-texto">' + d.texto + '</p>' +
+      (itens ? '<ul class="diag-lista">' + itens + '</ul>' : '<p class="diag-vazio">Nenhuma frente caiu neste quadrante.</p>') +
+    '</div>';
+  }
+
+  function selecionarQuadrante(bloco, q) {
+    var idx = parseInt(bloco.getAttribute('data-m'), 10);
+    var atual = estadoQuadrante[idx];
+    var novo = (atual === q) ? null : q;
+    estadoQuadrante[idx] = novo;
+
+    var svg = bloco.querySelector('svg.matriz');
+    svg.setAttribute('class', 'matriz' + (novo ? ' tem-sel sel' + novo : ''));
+    Array.prototype.forEach.call(bloco.querySelectorAll('.chip'), function (c) {
+      var on = novo !== null && parseInt(c.getAttribute('data-q'), 10) === novo;
+      c.classList.toggle('ativo', on);
+      c.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var alvo = bloco.querySelector('.diagnostico');
+    alvo.innerHTML = novo ? textoDiagnostico(idx, novo) : '';
+    if (novo) {
+      try { alvo.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { /* ignora */ }
+    }
   }
 
   function renderMatrizes() {
     var A = estado.notas.A, B = estado.notas.B, C = estado.notas.C;
+    estadoQuadrante = { 0: null, 1: null };
     app.innerHTML =
       '<section class="tela matrizes">' +
         '<h1>As suas matrizes</h1>' +
-        blocoMatriz(S.MATRIZES[0], A, B) +
-        blocoMatriz(S.MATRIZES[1], A, C) +
+        blocoMatriz(S.MATRIZES[0], 0, A, B) +
+        blocoMatriz(S.MATRIZES[1], 1, A, C) +
         '<button type="button" class="btn primario" id="baixar-pdf">Baixar PDF</button>' +
         '<div class="aviso-final">Pronto. Responda a folha de reflexão. Você pode guardar o celular quando terminar.</div>' +
         '<p class="status-envio" id="status-envio"></p>' +
       '</section>';
+
+    Array.prototype.forEach.call(app.querySelectorAll('.bloco-matriz'), function (bloco) {
+      bloco.addEventListener('click', function (ev) {
+        var alvo = ev.target.closest('[data-q]');
+        if (!alvo || !bloco.contains(alvo)) return;
+        selecionarQuadrante(bloco, parseInt(alvo.getAttribute('data-q'), 10));
+      });
+    });
+
     document.getElementById('baixar-pdf').addEventListener('click', function () {
       try { gerarPDF(); } catch (e) {
         console.error(e);
@@ -449,13 +506,13 @@
   function pdfMatriz(doc, m, A, X, ox, oy) {
     var C = S.CORES;
     var cell = 7.3, gx = ox + 9, gy = oy + 6, W = cell * 10;
-    var pos = { 1: [5, 0], 2: [0, 0], 3: [5, 5], 4: [0, 5] };
     var c;
 
     [1, 2, 3, 4].forEach(function (q) {
+      var p = S.POS_Q[q];
       c = rgb(C.q[q].fundo);
       doc.setFillColor(c[0], c[1], c[2]);
-      doc.rect(gx + pos[q][0] * cell, gy + pos[q][1] * cell, 5 * cell, 5 * cell, 'F');
+      doc.rect(gx + p[0] * cell, gy + p[1] * cell, 5 * cell, 5 * cell, 'F');
     });
 
     doc.setDrawColor(255, 255, 255);
@@ -479,10 +536,10 @@
     c = rgb(C.cinza);
     doc.setTextColor(c[0], c[1], c[2]);
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
+    doc.setFontSize(6);
     for (var v = 1; v <= 10; v++) {
-      doc.text(String(v), gx + (v - 0.5) * cell, gy + W + 3.6, { align: 'center' });
-      doc.text(String(v), gx - 1.6, gy + (10 - v + 0.5) * cell + 0.8, { align: 'right' });
+      doc.text(S.ordinal(v), gx + (v - 0.5) * cell, gy + W + 3.6, { align: 'center' });
+      doc.text(S.ordinal(v), gx - 1.2, gy + (v - 0.5) * cell + 0.8, { align: 'right' });
     }
 
     c = rgb(C.navy);
@@ -491,9 +548,9 @@
     doc.setFontSize(7.5);
     doc.text(m.eixoX, gx + W / 2, gy + W + 8.2, { align: 'center' });
     var rot = 'A · Energia';
-    doc.text(rot, ox + 2.6, gy + W / 2 + doc.getTextWidth(rot) / 2, { angle: 90 });
+    doc.text(rot, ox + 2.2, gy + W / 2 + doc.getTextWidth(rot) / 2, { angle: 90 });
 
-    var selos = { 1: [gx + W + 3, gy - 3], 2: [gx - 3.4, gy - 3], 3: [gx + W + 3, gy + W + 3.4], 4: [gx - 3.4, gy + W + 3.4] };
+    var selos = { 1: [gx - 3.4, gy - 3], 2: [gx + W + 3, gy - 3], 3: [gx - 3.4, gy + W + 3.4], 4: [gx + W + 3, gy + W + 3.4] };
     [1, 2, 3, 4].forEach(function (q) {
       c = rgb(C.q[q].selo);
       doc.setFillColor(c[0], c[1], c[2]);
@@ -504,20 +561,23 @@
       doc.text(String(q), selos[q][0], selos[q][1] + 0.9, { align: 'center' });
     });
 
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(5.5);
     S.FRENTES.forEach(function (f) {
-      var cx = gx + (X[f.sigla] - 0.5) * cell;
-      var cy = gy + (10 - A[f.sigla] + 0.5) * cell;
+      var cx = gx + (S.posicao(X[f.sigla]) - 0.5) * cell;
+      var cy = gy + (S.posicao(A[f.sigla]) - 0.5) * cell;
       c = rgb(C.coral);
       doc.setFillColor(c[0], c[1], c[2]);
       doc.circle(cx, cy, 1.2, 'F');
       c = rgb(C.navy);
       doc.setTextColor(c[0], c[1], c[2]);
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6);
-      doc.text(f.sigla, cx + 1.9, cy + 0.8);
+      var w = doc.getTextWidth(f.curto);
+      if (cx + 1.9 + w > gx + W + 0.5) doc.text(f.curto, cx - 1.9, cy + 0.8, { align: 'right' });
+      else doc.text(f.curto, cx + 1.9, cy + 0.8);
     });
   }
 
+  // Desenha o gabarito e devolve a posição vertical em que terminou
   function pdfGabarito(doc, m, A, X, ox, oy) {
     var porQ = porQuadrante(A, X);
     var y = oy;
@@ -542,12 +602,15 @@
       y += linhas.length * 3.0;
 
       doc.setFont('helvetica', 'bold');
-      doc.text('Neste quadrante: ', ox + 2.6, y);
-      var w = doc.getTextWidth('Neste quadrante: ');
+      doc.text('Neste quadrante:', ox + 2.6, y);
+      y += 3.0;
       doc.setFont('helvetica', 'normal');
-      doc.text(porQ[q].length ? porQ[q].join(', ') : 'nenhuma', ox + 2.6 + w, y);
-      y += 4.6;
+      var nomes = porQ[q].map(function (f) { return f.nome; }).join(', ');
+      var l2 = doc.splitTextToSize(nomes || 'nenhuma', 82);
+      doc.text(l2, ox + 2.6, y);
+      y += l2.length * 3.0 + 2.2;
     });
+    return y;
   }
 
   function gerarPDF() {
@@ -582,16 +645,16 @@
 
     pdfMatriz(doc, S.MATRIZES[0], A, B, 15, 35);
     pdfMatriz(doc, S.MATRIZES[1], A, Cn, 109, 35);
-    pdfGabarito(doc, S.MATRIZES[0], A, B, 15, 131);
-    pdfGabarito(doc, S.MATRIZES[1], A, Cn, 109, 131);
+    var y1 = pdfGabarito(doc, S.MATRIZES[0], A, B, 15, 131);
+    var y2 = pdfGabarito(doc, S.MATRIZES[1], A, Cn, 109, 131);
 
-    // Tabela de notas
-    var ty = 200;
+    // Tabela de posições
+    var ty = Math.max(200, y1, y2) + 4;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     c = rgb(C.navy);
     doc.setTextColor(c[0], c[1], c[2]);
-    doc.text('Notas por frente (10 = mais, 1 = menos)', 15, ty);
+    doc.text('Posição por frente (1º = mais, 10º = menos)', 15, ty);
     ty += 3;
 
     var colLabel = 30, colW = 15;
@@ -599,11 +662,12 @@
     doc.setFillColor(c[0], c[1], c[2]);
     doc.rect(15, ty, colLabel + colW * 10, rowH, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(8);
+    doc.setFontSize(6);
     S.FRENTES.forEach(function (f, i) {
-      doc.text(f.sigla, 15 + colLabel + i * colW + colW / 2, ty + 5, { align: 'center' });
+      doc.text(f.curto, 15 + colLabel + i * colW + colW / 2, ty + 4.8, { align: 'center' });
     });
 
+    doc.setFontSize(8);
     var linhas = [['A · Energia', A], ['B · Expectativa', B], ['C · Impacto', Cn]];
     linhas.forEach(function (l, r) {
       var y = ty + rowH * (r + 1);
@@ -614,7 +678,7 @@
       doc.text(l[0], 17, y + 5);
       doc.setFont('helvetica', 'normal');
       S.FRENTES.forEach(function (f, i) {
-        doc.text(String(l[1][f.sigla]), 15 + colLabel + i * colW + colW / 2, y + 5, { align: 'center' });
+        doc.text(S.ordinal(S.posicao(l[1][f.sigla])), 15 + colLabel + i * colW + colW / 2, y + 5, { align: 'center' });
       });
     });
     doc.setDrawColor(185, 192, 199);

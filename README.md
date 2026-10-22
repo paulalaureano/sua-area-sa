@@ -51,7 +51,7 @@ O seletor por nível vale para as visões 1 e 2. Se uma visão pedir a função 
 ## Checklist antes do evento
 
 - [ ] Testar com 30 acessos simultâneos
-- [ ] Testar em iPhone (Safari) e Android (Chrome): arrastar, botões ▲ ▼ e baixar o PDF
+- [ ] Testar em iPhone (Safari) e Android (Chrome): arrastar, botões ▲ ▼, tocar nos quadrantes e baixar o PDF
 - [ ] Testar o Wi-Fi e o 4G na Casa OcaHuna, de preferência no horário do evento
 - [ ] Imprimir os 6 QR codes na ficha da mesa
 - [ ] Limpar os dados de teste
@@ -60,6 +60,11 @@ O seletor por nível vale para as visões 1 e 2. Se uma visão pedir a função 
 
 ## Desvios em relação à especificação
 
+- **Posições em vez de notas na tela.** O participante ordena do 1º ao 10º lugar, e as matrizes, o PDF e o painel mostram posições. O banco continua guardando a nota (1º lugar = 10), então a tabela, a função `painel` e o `schema.sql` não mudam. A conversa é posição = 11 menos a nota.
+- **Matrizes espelhadas na horizontal.** Com o 1º lugar no topo e à esquerda, o quadrante 1 ("alta e alta") fica no canto superior esquerdo. Números, nomes e textos dos quadrantes são os mesmos.
+- **Diagnóstico ao tocar.** Tocar num quadrante (no desenho ou na faixa abaixo dele) abre o cartão com o texto do gabarito e as frentes com nome completo e posições. O PDF mostra os quatro diagnósticos.
+- **Nomes no lugar dos códigos** nos pontos da matriz, nas listas do diagnóstico e na tabela do PDF (nomes curtos em `shared.js`, campo `curto`).
+- **Código FOR.** A frente de fornecedores aparece como FOR nas telas e no painel. Internamente a chave gravada segue sendo PAR.
 - A função `painel` também devolve `dp_*` (desvio padrão) e `por_mesa_frente`, usados nas visões Divergências e Mesas.
 - `por_nivel_frente` na função `painel` também devolve `n` e os contadores de quadrante, para o seletor por nível funcionar nos blocos 3 e 4 (a especificação prevê essa extensão).
 - Restrição `jsonb_typeof = 'object'` nas colunas de notas e índice em `evento`.

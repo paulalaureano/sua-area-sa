@@ -24,6 +24,12 @@
   }
 
   function fmt(n) { return Number(n).toFixed(1).replace('.', ','); }
+  // O banco guarda notas (10 = 1º lugar). O painel mostra posição média (1º = mais).
+  function fmtPos(nota) { return fmt(11 - Number(nota)) + 'º'; }
+  function rotulo(sigla) {
+    for (var i = 0; i < S.FRENTES.length; i++) if (S.FRENTES[i].sigla === sigla) return S.FRENTES[i].rotulo;
+    return sigla;
+  }
   function num(x) { var n = Number(x); return isNaN(n) ? 0 : n; }
   function status(msg) { el('status').textContent = msg; }
 
@@ -89,10 +95,10 @@
       var alerta = i.ex > i.en;
       var sinal = i.dif > 0 ? '+' : (i.dif < 0 ? '-' : '');
       return '<div class="linha-barra' + (alerta ? ' alerta' : '') + '">' +
-        '<div class="nome"><b>' + i.sigla + '</b>' + nomeFrente(i.sigla) + '</div>' +
+        '<div class="nome"><b>' + rotulo(i.sigla) + '</b>' + nomeFrente(i.sigla) + '</div>' +
         '<div class="barras">' +
-          '<div class="barra energia"><i style="width:' + (i.en * 10) + '%"></i><span>' + fmt(i.en) + '</span></div>' +
-          '<div class="barra expectativa"><i style="width:' + (i.ex * 10) + '%"></i><span>' + fmt(i.ex) + '</span></div>' +
+          '<div class="barra energia"><i style="width:' + (i.en * 10) + '%"></i><span>' + fmtPos(i.en) + '</span></div>' +
+          '<div class="barra expectativa"><i style="width:' + (i.ex * 10) + '%"></i><span>' + fmtPos(i.ex) + '</span></div>' +
         '</div>' +
         '<div class="dif">' + sinal + fmt(Math.abs(i.dif)) + '</div>' +
       '</div>';
@@ -114,7 +120,7 @@
     if (!itens.length) { alvo.innerHTML = '<li class="vazio" style="display:block;background:none;padding:.4rem 0">Nenhuma frente por aqui</li>'; return; }
     alvo.innerHTML = itens.map(function (r, i) {
       return '<li><span class="pos">' + (i + 1) + '</span>' +
-        '<span class="nome"><b>' + r.frente + '</b>' + nomeFrente(r.frente) + '</span>' +
+        '<span class="nome"><b>' + rotulo(r.frente) + '</b>' + nomeFrente(r.frente) + '</span>' +
         '<span class="qtd">' + num(r[campo]) + ' <small>de ' + total + '</small></span></li>';
     }).join('');
   }
@@ -154,13 +160,13 @@
     var html = '<table class="tabela"><thead><tr><th>Frente</th>' +
       dims.map(function (d) { return '<th>' + d.nome + '</th>'; }).join('') + '</tr></thead><tbody>';
     itens.forEach(function (i) {
-      html += '<tr><td class="nome"><b>' + i.r.frente + '</b>' + nomeFrente(i.r.frente) + '</td>';
+      html += '<tr><td class="nome"><b>' + rotulo(i.r.frente) + '</b>' + nomeFrente(i.r.frente) + '</td>';
       dims.forEach(function (d) {
         var dp = num(i.r[d.d]);
         var forca = Math.min(1, dp / DP_MAX);
         var fundo = 'rgba(244,162,97,' + (forca * 0.38).toFixed(2) + ')';
         html += '<td><div class="cel' + (dp >= 3 ? ' alta' : '') + '" style="background:linear-gradient(0deg,' + fundo + ',' + fundo + '),#0D1B2A">' +
-          '<span class="m">' + fmt(i.r[d.m]) + '</span><span class="d">±' + fmt(dp) + '</span></div></td>';
+          '<span class="m">' + fmtPos(i.r[d.m]) + '</span><span class="d">±' + fmt(dp) + '</span></div></td>';
       });
       html += '</tr>';
     });
@@ -173,8 +179,8 @@
     celulas.sort(function (a, b) { return b.dp - a.dp; });
     topo.innerHTML = celulas.slice(0, 5).map(function (c, i) {
       return '<li><span class="pos">' + (i + 1) + '</span>' +
-        '<span class="nome"><b>' + c.frente + '</b>' + c.dim + '</span>' +
-        '<span class="qtd">±' + fmt(c.dp) + ' <small>média ' + fmt(c.media) + '</small></span></li>';
+        '<span class="nome"><b>' + rotulo(c.frente) + '</b>' + c.dim + '</span>' +
+        '<span class="qtd">±' + fmt(c.dp) + ' <small>posição média ' + fmtPos(c.media) + '</small></span></li>';
     }).join('');
   }
 
@@ -196,7 +202,7 @@
 
   function textoValor(v) {
     if (metrica === 'gap') return (v > 0 ? '+' : (v < 0 ? '-' : '')) + fmt(Math.abs(v));
-    return fmt(v);
+    return fmtPos(v);
   }
 
   function desenharMesas() {
@@ -211,7 +217,7 @@
       m.frentes[r.frente] = r;
     });
 
-    var cab = '<tr><th></th>' + S.FRENTES.map(function (f) { return '<th>' + f.sigla + '</th>'; }).join('') + '</tr>';
+    var cab = '<tr><th></th>' + S.FRENTES.map(function (f) { return '<th>' + f.rotulo + '</th>'; }).join('') + '</tr>';
     var corpo = '';
     for (var m = 1; m <= 6; m++) {
       var g = porMesa[m];
@@ -238,8 +244,8 @@
     alvo.innerHTML = '<table class="mesas"><thead>' + cab + '</thead><tbody>' + corpo + '</tbody></table>';
 
     leitura.textContent = metrica === 'gap'
-      ? 'Coral: a mesa espera mais do que investe nessa frente. Teal: investe mais do que espera. Grupos pequenos: use como abertura de conversa, não como conclusão.'
-      : 'Quanto mais forte o teal, maior a nota média da mesa. Grupos pequenos: use como abertura de conversa, não como conclusão.';
+      ? 'Diferença em posições. Coral: a mesa espera mais do que investe nessa frente. Teal: investe mais do que espera. Grupos pequenos: use como abertura de conversa, não como conclusão.'
+      : 'Quanto mais forte o teal, melhor a posição média da mesa (mais perto do 1º). Grupos pequenos: use como abertura de conversa, não como conclusão.';
   }
 
   /* ---------- roteamento de vistas ---------- */

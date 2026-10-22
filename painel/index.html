@@ -136,10 +136,11 @@
       <section class="bloco" id="b2">
         <h2>Energia × Expectativa</h2>
         <div class="legenda">
-          <span><b style="background:#2A9D8F"></b>Média de energia (A)</span>
-          <span><b style="background:#7F93A8"></b>Média de expectativa (B)</span>
+          <span><b style="background:#2A9D8F"></b>Posição média em energia (A)</span>
+          <span><b style="background:#7F93A8"></b>Posição média em expectativa (B)</span>
           <span><b style="background:#F76C5E"></b>Expectativa acima da energia</span>
         </div>
+        <div class="sub" style="margin:0 0 .4rem">Barra maior = posição melhor (mais perto do 1º). O número à direita é a diferença em posições.</div>
         <div id="barras"></div>
       </section>
 
@@ -163,7 +164,7 @@
     <main class="vista" id="vista-diverg" hidden>
       <section class="bloco">
         <h2>Onde a sala discorda</h2>
-        <div class="sub">Média e divergência das notas, por frente. Quanto maior a divergência, mais dividida está a sala.</div>
+        <div class="sub">Posição média e divergência (em posições), por frente. Quanto maior a divergência, mais dividida está a sala.</div>
         <div id="tabela-diverg"></div>
       </section>
       <section class="bloco">
@@ -178,10 +179,10 @@
       <section class="bloco">
         <h2>Mesas lado a lado</h2>
         <div class="metricas" id="metricas">
-          <button type="button" data-m="gap" class="ativo">Expectativa menos energia</button>
-          <button type="button" data-m="energia">Energia</button>
-          <button type="button" data-m="expectativa">Expectativa</button>
-          <button type="button" data-m="impacto">Impacto</button>
+          <button type="button" data-m="gap" class="ativo">Diferença: expectativa e energia</button>
+          <button type="button" data-m="energia">Posição em energia</button>
+          <button type="button" data-m="expectativa">Posição em expectativa</button>
+          <button type="button" data-m="impacto">Posição em impacto</button>
         </div>
         <div id="tabela-mesas"></div>
         <p class="nota-leitura" id="leitura-mesas"></p>
